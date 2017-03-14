@@ -60,6 +60,11 @@ public class ForumJSON {
     public String getUser() {
         return this.user;
     }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
+
     public Boolean isAnyFieldEmpty() {
         return (this.slug == null ||
                 this.user == null );

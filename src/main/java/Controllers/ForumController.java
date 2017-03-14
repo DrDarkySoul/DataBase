@@ -2,10 +2,9 @@ package Controllers;
 
 import DataBase.PostgreSQL;
 import Objects.ForumJSON;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import Objects.ThreadJSON;
+import org.springframework.web.bind.annotation.*;
+
 import java.net.HttpURLConnection;
 
 import javax.servlet.http.HttpServletResponse;
@@ -29,11 +28,49 @@ public class ForumController {
             produces = "application/json",
             consumes = "application/json")
     public String createForum(@RequestBody ForumJSON body,
-                              HttpSession httpSession, HttpServletResponse response) {
+                              HttpServletResponse response) {
         return (dataBase.createForum(body, new PostgreSQL.Callback() {
             @Override
             public void onSuccess() {
                 response.setStatus(HttpURLConnection.HTTP_CREATED);
+            }
+
+            @Override
+            public void onError(int err) {
+                response.setStatus(err);
+            }
+        }));
+    }
+
+    @RequestMapping(path = "/{forumSlug}/create",
+            method = RequestMethod.POST,
+            produces = "application/json",
+            consumes = "application/json")
+    public String createThread(@PathVariable("forumSlug") String slug,
+                               @RequestBody ThreadJSON body,
+                               HttpServletResponse response) {
+        return (dataBase.createThread(slug, body, new PostgreSQL.Callback() {
+            @Override
+            public void onSuccess() {
+                response.setStatus(HttpURLConnection.HTTP_CREATED);
+            }
+
+            @Override
+            public void onError(int err) {
+                response.setStatus(err);
+            }
+        }));
+    }
+
+    @RequestMapping(path = "{forumSlug}/details",
+            method = RequestMethod.GET,
+            produces = "application/json")
+    public String getForumInfo(@PathVariable("forumSlug") String slug,
+                               HttpServletResponse response) {
+        return (dataBase.getForumInfo(slug, new PostgreSQL.Callback() {
+            @Override
+            public void onSuccess() {
+                response.setStatus(HttpURLConnection.HTTP_OK);
             }
 
             @Override
